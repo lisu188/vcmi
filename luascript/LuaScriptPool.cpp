@@ -32,6 +32,9 @@ void LuaScriptPool::registerScript(const LuaScriptInstance * script)
 
 std::shared_ptr<Context> LuaScriptPool::getContext(const Script * script) const
 {
-	return cache.at(script);
+	auto it = cache.find(script);
+	if(it == cache.end())
+		return nullptr; // script is not owned by this pool (e.g. belongs to another backend)
+	return it->second;
 }
 }

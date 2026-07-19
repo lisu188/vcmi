@@ -21,6 +21,7 @@
 #include "spells/SpellSchoolHandler.h"
 #include "CSkillHandler.h"
 #include "../luascript/LuaModule.h"
+#include "scripting/ScriptingHandler.h"
 #include "entities/artifact/CArtHandler.h"
 #include "entities/faction/CTownHandler.h"
 #include "entities/hero/CHeroClassHandler.h"
@@ -229,7 +230,10 @@ void GameLibrary::initializeLibrary()
 	createHandler(obstacleHandler);
 	createHandler(mapLayerHandler);
 
-	scriptHandler = std::make_unique<scripting::LuaModule>();
+	auto scriptingHandler = std::make_unique<scripting::ScriptingHandler>();
+	scriptingHandler->addBackend(std::make_unique<scripting::LuaModule>());
+	// Additional backends (e.g. Python) are registered here behind their build-time guards.
+	scriptHandler = std::move(scriptingHandler);
 	scriptHandler->installScripting(spellEffectHandler.get());
 	modh->load();
 	modh->afterLoad();

@@ -44,6 +44,9 @@ class DLL_LINKAGE Pool
 public:
 	virtual ~Pool() = default;
 
+	/// Returns the live context for a script owned by this pool, or nullptr if this pool does not
+	/// own the given script. Returning nullptr (rather than throwing) lets a composite pool query
+	/// several backend pools in turn and pick the one that owns the script.
 	virtual std::shared_ptr<Context> getContext(const Script * script) const = 0;
 };
 
