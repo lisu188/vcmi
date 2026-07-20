@@ -198,6 +198,18 @@ void LuaContext::cleanupGlobals()
 	S.clear();
 }
 
+JsonNode LuaContext::callGlobal(const std::string & functionName, const JsonNode & parameters)
+{
+	// Pass an empty self plus `parameters` as the first explicit Lua argument, so a hook written
+	// as `function M:onEvent(params)` (self + params) reads its identifiers from `params`.
+	// Script methods still resolve via the self metatable (__index = scriptTable) set in callMethod.
+	// self must be an empty STRUCT (not a null JsonNode): LuaStack pushes null nodes as nil, and
+	// callMethod would then set a metatable on nil - affecting the whole nil type in this state.
+	JsonNode self;
+	self.Struct();
+	return callMethod<JsonNode>(functionName, self, parameters);
+}
+
 bool LuaContext::hasFunction(const std::string & name)
 {
 	std::lock_guard guard(mutex);

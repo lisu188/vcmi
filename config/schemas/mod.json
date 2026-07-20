@@ -308,6 +308,10 @@
 			"description" : "List of configuration files for spell effects",
 			"$ref" : "#/definitions/fileListOrObject"
 		},
+		"scripts" : {
+			"description" : "List of configuration files for general engine-event scripts",
+			"$ref" : "#/definitions/fileListOrObject"
+		},
 		"spells" : {
 			"description" : "List of configuration files for spells",
 			"$ref" : "#/definitions/fileListOrObject"

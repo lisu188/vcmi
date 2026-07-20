@@ -33,9 +33,24 @@ std::unique_ptr<Pool> ScriptingHandler::createPoolInstance(const Environment * E
 	std::vector<std::unique_ptr<Pool>> subPools;
 	subPools.reserve(backends.size());
 	for(const auto & backend : backends)
-		subPools.push_back(backend->createPoolInstance(ENV));
+	{
+		// A backend may legitimately produce no pool (e.g. disabled at runtime); skip it rather
+		// than storing a null sub-pool that getContext would dereference.
+		if(auto pool = backend->createPoolInstance(ENV))
+			subPools.push_back(std::move(pool));
+	}
 
 	return std::make_unique<CompositePool>(std::move(subPools));
+}
+
+std::shared_ptr<Script> ScriptingHandler::loadScript(const std::string & scope, const std::string & source)
+{
+	for(const auto & backend : backends)
+	{
+		if(auto script = backend->loadScript(scope, source))
+			return script;
+	}
+	return nullptr;
 }
 
 void ScriptingHandler::exportDocs(const boost::filesystem::path & outDir) const

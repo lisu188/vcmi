@@ -11,8 +11,8 @@
 		},
 		"implements" : {
 			"type" : "string",
-			"enum" : ["ANYTHING", "BATTLE_EFFECT"],
-			"description" : ""
+			"enum" : ["ANYTHING", "BATTLE_EFFECT", "ON_PLAYER_TURN_START"],
+			"description" : "Which engine extension point this script hooks. BATTLE_EFFECT is the spell-effect path; ON_PLAYER_TURN_START fires at the start of each player's turn. ANYTHING = loaded but not auto-dispatched."
 		}
 	}
 }

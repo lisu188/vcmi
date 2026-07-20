@@ -33,6 +33,8 @@ public:
 
 	std::unique_ptr<Pool> createPoolInstance(const Environment * ENV) const override;
 
+	std::shared_ptr<Script> loadScript(const std::string & scope, const std::string & source) override;
+
 	void exportDocs(const boost::filesystem::path & outDir) const override;
 
 private:
@@ -40,5 +42,11 @@ private:
 	using ScriptMap = std::map<std::string, ScriptPtr>;
 
 	std::shared_ptr<spells::effects::LuaSpellEffectFactory> luaSpellEffects;
+
+	/// General (non-spell-effect) scripts loaded via loadScript, keyed by identifier
+	/// (scope + ':' + source). LuaModule is the owner-of-record; these outlive every pool and are
+	/// re-registered into each pool created by createPoolInstance so that every game session
+	/// gets a live LuaContext for them.
+	ScriptMap generalScripts;
 };
 }

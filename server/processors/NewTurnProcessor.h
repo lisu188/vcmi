@@ -42,6 +42,10 @@ class NewTurnProcessor : boost::noncopyable
 
 	void updateNeutralTownGarrison(const CGTownInstance * t, int currentWeek) const;
 
+	/// Fires all scripts subscribed to ScriptEventKind::ON_PLAYER_TURN_START for the given player.
+	/// Server-side, data-only (identifiers passed as JSON); script exceptions are caught and logged.
+	void firePlayerTurnStartHooks(PlayerColor which);
+
 public:
 	NewTurnProcessor(CGameHandler * gameHandler);
 

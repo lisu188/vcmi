@@ -42,6 +42,7 @@ class SpellSchoolHandler;
 class MapFormatSettings;
 class CampaignRegionsHandler;
 class MapLayerTypeHandler;
+class ScriptHandler;
 
 namespace spells::effects
 {
@@ -105,6 +106,7 @@ public:
 	std::unique_ptr<CampaignRegionsHandler> campaignRegions;
 	std::unique_ptr<MapLayerTypeHandler> mapLayerHandler;
 	std::unique_ptr<scripting::Service> scriptHandler;
+	std::unique_ptr<ScriptHandler> scriptEventHandler;
 
 	GameLibrary();
 	~GameLibrary();

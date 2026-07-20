@@ -35,6 +35,8 @@ public:
 
 	std::unique_ptr<Pool> createPoolInstance(const Environment * ENV) const override;
 
+	std::shared_ptr<Script> loadScript(const std::string & scope, const std::string & source) override;
+
 	void exportDocs(const boost::filesystem::path & outDir) const override;
 
 private:

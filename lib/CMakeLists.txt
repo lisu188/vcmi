@@ -297,6 +297,7 @@ set(lib_MAIN_SRCS
 	spells/effects/SpellEffectHandler.cpp
 
 	scripting/ScriptingHandler.cpp
+	scripting/ScriptHandler.cpp
 
 	texts/CGeneralTextHandler.cpp
 	texts/CLegacyConfigParser.cpp
@@ -768,6 +769,7 @@ set(lib_MAIN_HEADERS
 	spells/effects/SpellEffectService.h
 
 	scripting/ScriptingHandler.h
+	scripting/ScriptHandler.h
 
 	texts/CGeneralTextHandler.h
 	texts/Languages.h

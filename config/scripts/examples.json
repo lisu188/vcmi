@@ -1,0 +1,6 @@
+{
+	"onTurn" : {
+		"source" : "examples/onTurn.lua",
+		"implements" : "ON_PLAYER_TURN_START"
+	}
+}
