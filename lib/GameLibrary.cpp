@@ -21,6 +21,9 @@
 #include "spells/SpellSchoolHandler.h"
 #include "CSkillHandler.h"
 #include "../luascript/LuaModule.h"
+#ifdef ENABLE_PYTHON
+#include "../pythonscript/PythonModule.h"
+#endif
 #include "scripting/ScriptingHandler.h"
 #include "scripting/ScriptHandler.h"
 #include "entities/artifact/CArtHandler.h"
@@ -233,7 +236,9 @@ void GameLibrary::initializeLibrary()
 
 	auto scriptingHandler = std::make_unique<scripting::ScriptingHandler>();
 	scriptingHandler->addBackend(std::make_unique<scripting::LuaModule>());
-	// Additional backends (e.g. Python) are registered here behind their build-time guards.
+#ifdef ENABLE_PYTHON
+	scriptingHandler->addBackend(std::make_unique<scripting::PythonModule>());
+#endif
 	scriptHandler = std::move(scriptingHandler);
 	scriptHandler->installScripting(spellEffectHandler.get());
 
