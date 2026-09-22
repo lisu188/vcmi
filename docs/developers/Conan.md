@@ -161,6 +161,8 @@ Also, when building for mobiles, it's better to pass the minimal required iOS de
 
 Note that if you wish to build LuaJIT (needed for scripting support) for mobiles, you must build it separately first, see below for details. Not required if you decide to use the script described in the next paragraph. Scripting is optional right now though, you can build VCMI without it.
 
+The experimental Python scripting backend (`-DENABLE_PYTHON=ON`, desktop only for now) additionally needs CPython >= 3.12 development files and `pybind11/3.0.x` (available on ConanCenter; consumed via `find_package(pybind11 CONFIG)` through the CMakeDeps generator). Prefer a shared libpython, and note that shipped builds must pin the exact CPython patch version for multiplayer determinism — see [Python_Scripting_System.md](Python_Scripting_System.md).
+
 But in case such approach doesn't fit you or you simply want to build everything just like our CI does, you'd need to execute just a single command. Please refer to [submodule's readme](../../dependencies/README.md) for details.
 
 Don't hesitate to ask for support in our Discord channel or in GitHub issues!

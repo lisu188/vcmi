@@ -31,6 +31,10 @@ target_link_libraries(vcmi PRIVATE vcmiMain)
 if(NOT ENABLE_MINIMAL_LIB)
 	target_link_libraries(vcmi PRIVATE vcmiLua)
 
+	if(ENABLE_PYTHON)
+		target_link_libraries(vcmi PRIVATE vcmiPython)
+	endif()
+
 	if(ENABLE_CLIENT OR ENABLE_TEST)
 		target_link_libraries(vcmi PRIVATE EmptyAI)
 

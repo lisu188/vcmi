@@ -24,6 +24,8 @@
 #include "../../lib/entities/ResourceTypeHandler.h"
 #include "../../lib/gameState/CGameState.h"
 #include "../../lib/gameState/SThievesGuildInfo.h"
+#include "../../lib/json/JsonNode.h"
+#include "../../lib/scripting/ScriptHandler.h"
 #include "../../lib/mapObjects/CGHeroInstance.h"
 #include "../../lib/mapObjects/CGTownInstance.h"
 #include "../../lib/mapObjects/IOwnableObject.h"
@@ -35,6 +37,8 @@
 #include "../../lib/pathfinder/TurnInfo.h"
 #include "../../lib/texts/CGeneralTextHandler.h"
 #include "../TurnStartVisitScheduler.h"
+
+#include <vcmi/scripting/Service.h>
 
 #include <vstd/RNG.h>
 
@@ -142,9 +146,49 @@ void NewTurnProcessor::handleTownEvents(const CGTownInstance * town)
 	}
 }
 
+void NewTurnProcessor::firePlayerTurnStartHooks(PlayerColor which)
+{
+	// scriptEventHandler is null unless the general-scripts content type loaded something;
+	// getScriptsFor() returns an empty range for events no script subscribed to.
+	if(!LIBRARY->scriptEventHandler)
+		return;
+
+	const auto & scripts = LIBRARY->scriptEventHandler->getScriptsFor(ScriptEventKind::ON_PLAYER_TURN_START);
+	if(scripts.empty())
+		return;
+
+	// Identifiers only - never live engine objects across the neutral interface.
+	// The script re-queries the world via its already-injected GAME / LIBRARY bindings.
+	JsonNode params;
+	params["player"].Integer() = which.getNum();
+	params["day"].Integer()    = gameHandler->gameState().day;
+
+	const scripting::Pool & pool = gameHandler->gameState().getScriptContextPool();
+
+	for(const scripting::Script * script : scripts)
+	{
+		auto context = pool.getContext(script);
+		if(!context)
+			continue; // script belongs to no live backend pool this session
+
+		try
+		{
+			// Fire-and-forget: the returned JsonNode is intentionally ignored for this hook.
+			context->callGlobal("onPlayerTurnStart", params);
+		}
+		catch(const std::exception & e)
+		{
+			// A misbehaving script must NEVER abort turn processing (netcode + save integrity).
+			logGlobal->error("Script '%s' onPlayerTurnStart failed: %s", script->getIdentifier(), e.what());
+		}
+	}
+}
+
 void NewTurnProcessor::onPlayerTurnStarted(PlayerColor which)
 {
 	const auto * playerState = gameHandler->gameState().getPlayerState(which);
+
+	firePlayerTurnStartHooks(which);
 
 	handleTimeEvents(which);
 	for (const auto * t : playerState->getTowns())

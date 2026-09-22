@@ -296,6 +296,9 @@ set(lib_MAIN_SRCS
 	spells/effects/LocationEffect.cpp
 	spells/effects/SpellEffectHandler.cpp
 
+	scripting/ScriptingHandler.cpp
+	scripting/ScriptHandler.cpp
+
 	texts/CGeneralTextHandler.cpp
 	texts/CLegacyConfigParser.cpp
 	texts/MetaString.cpp
@@ -764,6 +767,9 @@ set(lib_MAIN_HEADERS
 	spells/effects/LocationEffect.h
 	spells/effects/SpellEffectHandler.h
 	spells/effects/SpellEffectService.h
+
+	scripting/ScriptingHandler.h
+	scripting/ScriptHandler.h
 
 	texts/CGeneralTextHandler.h
 	texts/Languages.h

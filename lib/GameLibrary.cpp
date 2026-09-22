@@ -21,6 +21,11 @@
 #include "spells/SpellSchoolHandler.h"
 #include "CSkillHandler.h"
 #include "../luascript/LuaModule.h"
+#ifdef ENABLE_PYTHON
+#include "../pythonscript/PythonModule.h"
+#endif
+#include "scripting/ScriptingHandler.h"
+#include "scripting/ScriptHandler.h"
 #include "entities/artifact/CArtHandler.h"
 #include "entities/faction/CTownHandler.h"
 #include "entities/hero/CHeroClassHandler.h"
@@ -229,8 +234,18 @@ void GameLibrary::initializeLibrary()
 	createHandler(obstacleHandler);
 	createHandler(mapLayerHandler);
 
-	scriptHandler = std::make_unique<scripting::LuaModule>();
+	auto scriptingHandler = std::make_unique<scripting::ScriptingHandler>();
+	scriptingHandler->addBackend(std::make_unique<scripting::LuaModule>());
+#ifdef ENABLE_PYTHON
+	scriptingHandler->addBackend(std::make_unique<scripting::PythonModule>());
+#endif
+	scriptHandler = std::move(scriptingHandler);
 	scriptHandler->installScripting(spellEffectHandler.get());
+
+	// Must precede modh->load(): ScriptHandler::loadObject calls scriptHandler->loadScript(...),
+	// so the composite scripting Service has to be live before any script content is loaded.
+	createHandler(scriptEventHandler);
+
 	modh->load();
 	modh->afterLoad();
 

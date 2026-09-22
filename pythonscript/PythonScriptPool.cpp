@@ -1,5 +1,5 @@
 /*
- * LuaScriptPool.cpp, part of VCMI engine
+ * PythonScriptPool.cpp, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -8,33 +8,32 @@
  *
  */
 #include "StdInc.h"
-#include "LuaScriptPool.h"
+#include "PythonScriptPool.h"
 
-#include "LuaScriptInstance.h"
-#include "LuaContext.h"
-
-#include "../lib/json/JsonNode.h"
+#include "PythonContext.h"
+#include "PythonScriptInstance.h"
 
 namespace scripting
 {
 
-LuaScriptPool::LuaScriptPool(const LuaModule & luaModule, const Environment * ENV)
+PythonScriptPool::PythonScriptPool(const PythonModule & pythonModule, const Environment * ENV)
 	: env(ENV)
 {
 }
 
-void LuaScriptPool::registerScript(const LuaScriptInstance * script)
+void PythonScriptPool::registerScript(const PythonScriptInstance * script)
 {
 	auto context = script->createContext(env);
 	cache[script] = context;
 	context->initialize();
 }
 
-std::shared_ptr<Context> LuaScriptPool::getContext(const Script * script) const
+std::shared_ptr<Context> PythonScriptPool::getContext(const Script * script) const
 {
 	auto it = cache.find(script);
 	if(it == cache.end())
 		return nullptr; // script is not owned by this pool (e.g. belongs to another backend)
 	return it->second;
 }
+
 }

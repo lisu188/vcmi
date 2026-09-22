@@ -215,7 +215,7 @@ if(ENABLE_NULLKILLER2_AI)
 	# instead of linking the facade and loading a second copy of lib globals.
 	target_sources(vcmitest PRIVATE $<TARGET_OBJECTS:Nullkiller2>)
 	set(vcmitest_LIBS gtest gmock vcmiMain vcmiservercommon TBB::tbb ${SYSTEM_LIBS})
-	foreach(optional_vcmitest_target IN ITEMS vcmiLua EmptyAI StupidAI MMAI)
+	foreach(optional_vcmitest_target IN ITEMS vcmiLua vcmiPython EmptyAI StupidAI MMAI)
 		if(TARGET ${optional_vcmitest_target})
 			list(APPEND vcmitest_LIBS ${optional_vcmitest_target})
 		endif()

@@ -56,6 +56,7 @@ option(ENABLE_NULLKILLER2_AI "Enable compilation of Nullkiller2AI library" ON)
 option(ENABLE_STUPID_AI "Enable compilation of StupidAI library" ON)
 option(ENABLE_BATTLE_AI "Enable compilation of BattleAI library" ON)
 option(ENABLE_MMAI "Enable compilation of MMAI AI library" ON)
+option(ENABLE_PYTHON "Enable compilation of Python scripting backend (requires Python >= 3.12 and pybind11 >= 3.0)" OFF)
 
 # Compilation options
 
@@ -360,6 +361,9 @@ endif()
 if(ENABLE_MMAI)
 	add_definitions(-DENABLE_MMAI)
 endif()
+if(ENABLE_PYTHON)
+	add_definitions(-DENABLE_PYTHON)
+endif()
 
 
 if(IOS)
@@ -618,6 +622,13 @@ if(NOT ENABLE_MINIMAL_LIB)
 			)
 	    endif()
 	endif()
+
+	if(ENABLE_PYTHON)
+		# Sub-interpreters with per-interpreter GIL (the isolation model the Python backend is
+		# built on) require Python >= 3.12 and pybind11 >= 3.0 (pybind11/subinterpreter.h).
+		find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter Development)
+		find_package(pybind11 3.0 CONFIG REQUIRED)
+	endif()
 endif()
 
 ############################################
@@ -717,6 +728,9 @@ endif()
 
 if(NOT ENABLE_MINIMAL_LIB)
 	add_subdirectory(luascript)
+	if(ENABLE_PYTHON)
+		add_subdirectory(pythonscript)
+	endif()
 endif()
 
 add_subdirectory(libFacade)

@@ -42,6 +42,11 @@ public:
 	template<typename ReturnType, typename... Args>
 	ReturnType callMethod(const std::string & name, const JsonNode & params, Args&&... args);
 
+	/// Data-only entry point for general engine hooks (see scripting::Context::callGlobal).
+	/// Calls scriptTable[functionName](self, parameters) where self is an empty table whose
+	/// metatable __index resolves to scriptTable, and returns the function's JSON result.
+	JsonNode callGlobal(const std::string & functionName, const JsonNode & parameters) override;
+
 private:
 	std::mutex mutex;
 	lua_State * L;
