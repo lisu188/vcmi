@@ -636,7 +636,7 @@ CStackWindow::MainSection::MainSection(CStackWindow * owner, int yOffset, bool s
 
 	const CStack* battleStack = parent->info->stack;
 
-	int dmgMultiply = 1;
+	int64_t dmgMultiply = 1;
 	if (battleStack != nullptr && battleStack->hasBonusOfType(BonusType::SIEGE_WEAPON))
 	{
 		static const auto bonusSelector =
