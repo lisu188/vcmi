@@ -8,6 +8,7 @@
  *
  */
 #include "StdInc.h"
+#include <stdexcept>
 
 #include "CUnitState.h"
 
@@ -180,7 +181,7 @@ void CHealth::addResurrected(int32_t amount)
 
 int64_t CHealth::available() const
 {
-	return static_cast<int64_t>(firstHPleft) + owner->getMaxHealth() * fullUnits;
+	return static_cast<int64_t>(firstHPleft) + static_cast<int64_t>(owner->getMaxHealth()) * fullUnits;
 }
 
 int64_t CHealth::total() const
@@ -296,9 +297,13 @@ void CHealth::takeResurrected()
 {
 	if(resurrected != 0)
 	{
+		// Serialized counters are signed. Validate this operation's normal
+		// nonnegative-state precondition before its wide subtraction.
+		if(firstHPleft < 0 || fullUnits < 0 || resurrected < 0)
+			throw std::invalid_argument("Negative health state counters");
 		int64_t totalHealth = available();
 
-		totalHealth -= resurrected * owner->getMaxHealth();
+		totalHealth -= static_cast<int64_t>(resurrected) * owner->getMaxHealth();
 		vstd::amax(totalHealth, 0);
 		setFromTotal(totalHealth);
 		resurrected = 0;
@@ -1008,3 +1013,4 @@ void CUnitStateDetached::spendMana(ServerCallback * server, const int spellCost)
 }
 
 }
+
