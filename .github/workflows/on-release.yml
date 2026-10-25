@@ -2,6 +2,9 @@ name: Notify other repos of release
 on:
   release:
     types: [published]
+permissions:
+  contents: read
+
 jobs:
   notify_repos:
     if: ${{ !github.event.release.prerelease }}
@@ -14,3 +17,4 @@ jobs:
           repository: vcmi/homebrew-vcmi
           event-type: on-release
           client-payload: '{"release": ${{ toJson(github.event.release) }}}'
+

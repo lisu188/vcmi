@@ -13,6 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build (${{ matrix.platform }})
@@ -997,3 +1000,4 @@ jobs:
             --title "VCMI $TAG" \
             --notes "$(cat .github/release_notes.md.template)$(printf '\n\nBuilt by [Actions run #%s](%s).\n' "$GITHUB_RUN_ID" "$RUN_URL")" \
             release/*
+
