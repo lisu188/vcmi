@@ -32,7 +32,7 @@ public:
 		:initialCreature(initial), upgradedCreature(upgraded), count(count)
 	{
 		cost = (upgradedCreature.toCreature()->getFullRecruitCost() - initialCreature.toCreature()->getFullRecruitCost()) * count;
-		upgradeValue = (upgradedCreature.toCreature()->getAIValue() - initialCreature.toCreature()->getAIValue()) * count;
+		upgradeValue = (static_cast<int64_t>(upgradedCreature.toCreature()->getAIValue()) - initialCreature.toCreature()->getAIValue()) * count;
 	}
 };
 

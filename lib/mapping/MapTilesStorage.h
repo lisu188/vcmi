@@ -12,6 +12,9 @@
 
 #include "../int3.h"
 
+#include <limits>
+#include <stdexcept>
+
 template<typename DataType>
 class MapTilesStorage
 {
@@ -19,17 +22,30 @@ class MapTilesStorage
 	TInternalContainer storage;
 	int3 dimensions = {0,0,0};
 
+	static size_t checkedTileCount(const int3 & size)
+	{
+		if(size.x < 0 || size.y < 0 || size.z < 0)
+			throw std::length_error("Negative map storage dimensions");
+		if(!size.x || !size.y || !size.z)
+			return 0;
+		// The map interfaces use signed 32-bit tile indices. Retain that
+		// representation limit instead of silently wrapping an allocation.
+		const auto limit = static_cast<size_t>(std::numeric_limits<int32_t>::max());
+		size_t count = static_cast<size_t>(size.x);
+		if(size.y && count > limit / size.y)
+			throw std::length_error("Map storage dimensions are too large");
+		count *= size.y;
+		if(size.z && count > limit / size.z)
+			throw std::length_error("Map storage dimensions are too large");
+		return count * size.z;
+	}
+
 	size_t getTileIndex(const int3 & tile) const
 	{
-		int32_t result = 0;
-		result += tile.z * dimensions.x * dimensions.y;
-		result += tile.x * dimensions.y;
-		result += tile.y;
-
 		assert(tile.x >= 0 && tile.x < dimensions.x);
 		assert(tile.y >= 0 && tile.y < dimensions.y);
 		assert(tile.z >= 0 && tile.z < dimensions.z);
-		return result;
+		return size_t(tile.z) * dimensions.x * dimensions.y + size_t(tile.x) * dimensions.y + tile.y;
 	}
 
 public:
@@ -41,7 +57,7 @@ public:
 
 	MapTilesStorage() = default;
 	MapTilesStorage(int3 dimensions) :
-		storage(dimensions.x * dimensions.y * dimensions.z),
+		storage(checkedTileCount(dimensions)),
 		dimensions(dimensions)
 	{}
 
@@ -58,13 +74,18 @@ public:
 	{
 		uint32_t lengthUnused = 0;
 		h & lengthUnused;
-		h & dimensions.z;
-		h & dimensions.x;
-		h & dimensions.y;
+		auto serializedDimensions = dimensions;
+		h & serializedDimensions.z;
+		h & serializedDimensions.x;
+		h & serializedDimensions.y;
 		if (!h.saving)
-			storage.resize(dimensions.x * dimensions.y * dimensions.z);
+		{
+			storage.resize(checkedTileCount(serializedDimensions));
+			dimensions = serializedDimensions;
+		}
 
 		for (auto & element : storage)
 			h & element;
 	}
 };
+
