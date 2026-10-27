@@ -9,6 +9,7 @@
  */
 #include "StdInc.h"
 #include "CSpellWindow.h"
+#include "SpellPageRange.h"
 
 #include "../../lib/ScopeGuard.h"
 
@@ -321,6 +322,8 @@ void CSpellWindow::searchInput()
 void CSpellWindow::processSpells()
 {
 	mySpells.clear();
+	sitesPerTabAdv.clear();
+	sitesPerTabBattle.clear();
 
 	//initializing castable spells
 	mySpells.reserve(LIBRARY->spellh->objects.size());
@@ -511,35 +514,9 @@ void CSpellWindow::computeSpellsPerArea()
 		}
 	}
 
-	if(selectedTab == SpellSchool::ANY)
-	{
-		if(spellsCurSite.size() > spellsPerPage)
-		{
-			spellsCurSite = std::vector<const CSpell *>(spellsCurSite.begin() + currentPage*spellsPerPage, spellsCurSite.end());
-			if(spellsCurSite.size() > spellsPerPage)
-			{
-				spellsCurSite.erase(spellsCurSite.begin()+spellsPerPage, spellsCurSite.end());
-			}
-		}
-	}
-	else
-	{
-		if(spellsCurSite.size() > spellsPerPage - 2)
-		{
-			if(currentPage == 0)
-			{
-				spellsCurSite.erase(spellsCurSite.begin()+spellsPerPage-2, spellsCurSite.end());
-			}
-			else
-			{
-				spellsCurSite = std::vector<const CSpell *>(spellsCurSite.begin() + (currentPage-1)*spellsPerPage + spellsPerPage-2, spellsCurSite.end());
-				if(spellsCurSite.size() > spellsPerPage)
-				{
-					spellsCurSite.erase(spellsCurSite.begin()+spellsPerPage, spellsCurSite.end());
-				}
-			}
-		}
-	}
+	const auto [offset, length] = SpellWindowDetail::pageRange(spellsCurSite.size(), currentPage, spellsPerPage, selectedTab != SpellSchool::ANY);
+	const auto first = spellsCurSite.begin() + static_cast<std::vector<const CSpell *>::difference_type>(offset);
+	spellsCurSite = std::vector<const CSpell *>(first, first + static_cast<std::vector<const CSpell *>::difference_type>(length));
 	//applying
 	if(selectedTab == SpellSchool::ANY || currentPage != 0)
 	{
@@ -898,3 +875,4 @@ void CSpellWindow::SpellArea::setSpell(const CSpell * spell)
 		cost->setText(costfmt.str());
 	}
 }
+

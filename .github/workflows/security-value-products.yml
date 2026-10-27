@@ -1,0 +1,26 @@
+name: Rebirth and damage value source fixtures
+on:
+  pull_request:
+    paths:
+      - 'lib/CStack.cpp'
+      - 'client/windows/CCreatureWindow.cpp'
+      - 'test/security/test_value_products_valid_fixtures.py'
+      - '.github/workflows/security-value-products.yml'
+  push:
+    branches: [develop]
+    paths:
+      - 'lib/CStack.cpp'
+      - 'client/windows/CCreatureWindow.cpp'
+      - 'test/security/test_value_products_valid_fixtures.py'
+      - '.github/workflows/security-value-products.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  valid-value-products:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Compile and run ordinary rebirth and damage-label fixtures
+        run: python3 test/security/test_value_products_valid_fixtures.py -v
