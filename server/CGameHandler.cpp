@@ -3834,14 +3834,24 @@ bool CGameHandler::sacrificeCreatures(const IMarket * market, const CGHeroInstan
 	if (!hero)
 		COMPLAIN_RET("You need hero to sacrifice creature!");
 
+	if (!market || slot.size() != count.size())
+		COMPLAIN_RET("Invalid creature sacrifice request!");
+
 	int expSum = 0;
 	auto finish = [this, &hero, &expSum]()
 	{
 		giveExperience(hero, hero->calculateXp(expSum));
 	};
 
-	for(int i = 0; i < slot.size(); ++i)
+	for(size_t i = 0; i < slot.size(); ++i)
 	{
+		if (!slot[i].validSlot() || !hero->hasStackAtSlot(slot[i])
+			|| count[i] == 0 || count[i] > static_cast<ui32>(std::numeric_limits<TQuantity>::max()))
+		{
+			finish();
+			COMPLAIN_RET("Invalid creature sacrifice request!");
+		}
+
 		int oldCount = hero->getStackCount(slot[i]);
 
 		if(oldCount < static_cast<int>(count[i]))
@@ -3849,7 +3859,7 @@ bool CGameHandler::sacrificeCreatures(const IMarket * market, const CGHeroInstan
 			finish();
 			COMPLAIN_RET("Not enough creatures to sacrifice!")
 		}
-		else if(oldCount == count[i] && hero->stacksCount() == 1 && hero->needsLastStack())
+		else if(oldCount == static_cast<int>(count[i]) && hero->stacksCount() == 1 && hero->needsLastStack())
 		{
 			finish();
 			COMPLAIN_RET("Cannot sacrifice last creature!");

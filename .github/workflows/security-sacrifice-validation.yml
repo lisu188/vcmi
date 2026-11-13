@@ -1,0 +1,24 @@
+name: Creature sacrifice source fixtures
+on:
+  pull_request:
+    paths:
+      - 'server/CGameHandler.cpp'
+      - 'test/security/test_sacrifice_valid_fixtures.py'
+      - '.github/workflows/security-sacrifice-validation.yml'
+  push:
+    branches: [develop]
+    paths:
+      - 'server/CGameHandler.cpp'
+      - 'test/security/test_sacrifice_valid_fixtures.py'
+      - '.github/workflows/security-sacrifice-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  valid-sacrifices:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Compile and run ordinary creature-sacrifice fixtures
+        run: python3 test/security/test_sacrifice_valid_fixtures.py -v
