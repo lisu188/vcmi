@@ -21,6 +21,7 @@
 #include "../../../lib/spells/CSpellHandler.h"
 #include "../../../lib/spells/adventure/TownPortalEffect.h"
 #include "../Engine/Nullkiller.h"
+#include "../Engine/PathfinderCapacity.h"
 #include "../AIGateway.h"
 #include "../Helpers/DimensionDoorUtils.h"
 #include "Actions/DimensionDoorAction.h"
@@ -50,6 +51,7 @@ AISharedStorage::AISharedStorage(int3 sizes, int numChains, const CCallback & cc
 {
 	if(!shared)
 	{
+		(void)checkedPathfinderNodeCount<AIPathNode>(sizes.x, sizes.y, sizes.z, numChains);
 		shared.reset(new boost::multi_array<AIPathNode, 4>(boost::extents[sizes.z][sizes.x][sizes.y][numChains]));
 		nodes = shared;
 
@@ -111,8 +113,9 @@ int AINodeStorage::getBucketSize() const
 }
 
 AINodeStorage::AINodeStorage(Nullkiller * aiNk, const int3 & sizes)
-	: sizes(sizes), aiNk(aiNk), nodes(sizes, aiNk->settings->getPathfinderBucketSize() * aiNk->settings->getPathfinderBucketsCount(), *aiNk->cc)
+	: sizes(sizes), aiNk(aiNk), nodes(sizes, checkedPathfinderCapacity(aiNk->settings->getPathfinderBucketsCount(), aiNk->settings->getPathfinderBucketSize()), *aiNk->cc)
 {
+	(void)checkedPathfinderNodeCount<EPathAccessibility>(sizes.x, sizes.y, sizes.z, static_cast<int>(EPathfindingLayer::NUM_LAYERS));
 	accessibility = std::make_unique<boost::multi_array<EPathAccessibility, 4>>(
 		boost::extents[sizes.z][sizes.x][sizes.y][EPathfindingLayer::NUM_LAYERS]);
 }
@@ -488,8 +491,9 @@ public:
 	HeroChainCalculationTask(AINodeStorage & storage, const std::vector<int3> & tiles, const uint64_t chainMask, const int heroChainTurn)
 		: storage(storage), chainMask(chainMask), heroChainTurn(heroChainTurn), tiles(tiles)
 	{
-		existingChains.reserve(storage.getBucketCount() * storage.getBucketSize());
-		newChains.reserve(storage.getBucketCount() * storage.getBucketSize());
+		const auto capacity = static_cast<size_t>(checkedPathfinderCapacity(storage.getBucketCount(), storage.getBucketSize()));
+		existingChains.reserve(capacity);
+		newChains.reserve(capacity);
 	}
 
 	void execute(const tbb::blocked_range<size_t> & r)
@@ -1931,3 +1935,4 @@ std::string AIPath::toString() const
 }
 
 }
+

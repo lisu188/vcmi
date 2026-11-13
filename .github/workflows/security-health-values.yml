@@ -1,0 +1,26 @@
+name: Wide health value source fixtures
+on:
+  pull_request:
+    paths:
+      - 'lib/battle/CUnitState.cpp'
+      - 'lib/battle/CUnitState.h'
+      - 'test/security/test_health_value_valid_fixtures.py'
+      - '.github/workflows/security-health-values.yml'
+  push:
+    branches: [develop]
+    paths:
+      - 'lib/battle/CUnitState.cpp'
+      - 'lib/battle/CUnitState.h'
+      - 'test/security/test_health_value_valid_fixtures.py'
+      - '.github/workflows/security-health-values.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  valid-health-values:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Compile and run valid positive health arithmetic fixtures
+        run: python3 test/security/test_health_value_valid_fixtures.py -v

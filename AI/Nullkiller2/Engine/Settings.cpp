@@ -11,6 +11,7 @@
 #include <limits>
 
 #include "Settings.h"
+#include "PathfinderCapacity.h"
 
 #include "../../../lib/constants/StringConstants.h"
 #include "../../../lib/mapObjectConstructors/AObjectTypeHandler.h"
@@ -53,8 +54,11 @@ namespace NK2AI
 		scoutHeroTurnDistanceLimit = node["scoutHeroTurnDistanceLimit"].Integer();
 		maxPass = node["maxPass"].Integer();
 		maxPriorityPass = node["maxPriorityPass"].Integer();
-		pathfinderBucketsCount = node["pathfinderBucketsCount"].Integer();
-		pathfinderBucketSize = node["pathfinderBucketSize"].Integer();
+		const auto bucketCount = node["pathfinderBucketsCount"].Integer();
+		const auto bucketSize = node["pathfinderBucketSize"].Integer();
+		(void)checkedPathfinderCapacity(bucketCount, bucketSize);
+		pathfinderBucketsCount = static_cast<int>(bucketCount);
+		pathfinderBucketSize = static_cast<int>(bucketSize);
 		maxGoldPressure = node["maxGoldPressure"].Float();
 		retreatThresholdRelative = node["retreatThresholdRelative"].Float();
 		retreatThresholdAbsolute = node["retreatThresholdAbsolute"].Float();
@@ -67,3 +71,4 @@ namespace NK2AI
 		useOneWayMonoliths = node["useOneWayMonoliths"].Bool();
 	}
 }
+
