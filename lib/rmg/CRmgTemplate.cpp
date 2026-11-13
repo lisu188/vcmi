@@ -13,6 +13,8 @@
 #include "CRmgTemplate.h"
 #include "Functions.h"
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include "../TerrainHandler.h"
 #include "../GameLibrary.h"
 #include "../constants/StringConstants.h"
@@ -699,9 +701,12 @@ CRmgTemplate::CRmgTemplate()
 
 bool CRmgTemplate::matchesSize(const int3 & value) const
 {
-	const int64_t square = value.x * value.y * value.z;
-	const int64_t minSquare = minSize.x * minSize.y * minSize.z;
-	const int64_t maxSquare = maxSize.x * maxSize.y * maxSize.z;
+	// Three signed 32-bit factors need at most 94 signed bits. Fixed-width
+	// int128 keeps custom template bounds exact without imposing a map-size cap.
+	using Volume = boost::multiprecision::int128_t;
+	const Volume square = Volume(value.x) * value.y * value.z;
+	const Volume minSquare = Volume(minSize.x) * minSize.y * minSize.z;
+	const Volume maxSquare = Volume(maxSize.x) * maxSize.y * maxSize.z;
 
 	return minSquare <= square && square <= maxSquare;
 }
@@ -1164,3 +1169,4 @@ const std::vector<ObjectInfo> & ZoneOptions::getConfiguredObjects() const
 {
 	return objectConfig.getConfiguredObjects();
 }
+
