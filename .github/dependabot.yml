@@ -9,3 +9,12 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every day
       interval: "daily"
+
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
