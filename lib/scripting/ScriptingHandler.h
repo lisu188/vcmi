@@ -27,6 +27,8 @@ class DLL_LINKAGE ScriptingHandler final : public Service
 public:
 	ScriptingHandler();
 	~ScriptingHandler();
+	ScriptingHandler(const ScriptingHandler &) = delete;
+	ScriptingHandler & operator=(const ScriptingHandler &) = delete;
 
 	/// Adds a backend. Order is preserved; getContext() queries backends in registration order.
 	void addBackend(std::unique_ptr<Service> backend);
@@ -50,6 +52,8 @@ class DLL_LINKAGE CompositePool final : public Pool
 public:
 	explicit CompositePool(std::vector<std::unique_ptr<Pool>> subPools);
 	~CompositePool();
+	CompositePool(const CompositePool &) = delete;
+	CompositePool & operator=(const CompositePool &) = delete;
 
 	std::shared_ptr<Context> getContext(const Script * script) const override;
 
